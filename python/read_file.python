@@ -1,0 +1,54 @@
+from os import walk
+
+path = '/Users/jsnyman/tmp/zimwiki'
+
+count = 1
+level  = 1
+
+folders = []
+files = []
+
+
+def addNodes(parent, foldernames, filenames):
+	#print 'level: %d' %level
+	#print foldernames
+	t = parent, tuple(foldernames)
+	folders.extend(t)
+	return
+
+def addFileNodes(parent, filenames):
+	#print 'level: %d' %level
+	#print filenames
+	t = parent, tuple(foldernames)
+	files.extend(t)
+	return
+
+for (root, foldernames, filenames) in walk(path):#, topdown=False):
+#	print 'root %s' %root
+#	print 'foldernames:'
+#	print foldernames
+#	print 'filenames'
+#	print filenames
+	addFolderNodes(root, foldernames)
+	addFileNodes(root, filenames)
+	level += 1
+#	print '#########################'
+
+	
+print '#########################'
+for ftup in folders:
+	#parent = ftup[1]
+	print ftup
+	print '#########################'
+#	d = folders[i]
+#	f = files[i]
+#	print 'level %d' %(i+1)
+#	print 'folders: \n'
+#	for fold in d:
+#		print fold
+#	print '#########################'
+#	
+#print '-------------'
+#print files
+#print '-------------'
+#print folders

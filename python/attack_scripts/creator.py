@@ -24,12 +24,12 @@ class FolderCreator(object):
             os.makedirs(evpath)
         else:
             Console.inform('%s already exists' % evpath)
-        repath = path + '/received'
-        if not os.path.exists(repath):
-            Console.add('Creating %s' % repath)
-            os.makedirs(repath)
-        else:
-            Console.inform('%s already exists' % repath)
+        # repath = path + '/received'
+        # if not os.path.exists(repath):
+        #     Console.add('Creating %s' % repath)
+        #     os.makedirs(repath)
+        # else:
+        #     Console.inform('%s already exists' % repath)
         # Create the main notes.md & write first lines
         notespath = path + '/notes.md'
         if not os.path.exists(notespath):
@@ -40,6 +40,15 @@ class FolderCreator(object):
             Console.add('Creating %s' % notespath)
         else:
             Console.inform('%s already exists' % notespath)
+        userlist_path = path + '/users.txt'
+        if not os.path.exists(userlist_path):
+            with open(userlist_path, 'w') as f:
+                f.write("\n")
+                f.write("admin\n")
+                f.write("root\n")
+            Console.add('Creating %s' % userlist_path)
+        else:
+            Console.inform('%s already exists' % userlist_path)
         Console.inform('Project structure created: %s/' % path)
 
     @staticmethod
@@ -71,6 +80,16 @@ class FolderCreator(object):
 
         Console.inform('Host folder structure created: %s/' % path)
 
+    @staticmethod
+    def create_port_folder(port):
+        print '##################################'
+        print 'Creating the folder for the port'
+        path = port.get_folder_name()
+        if not os.path.exists(path):
+            Console.add('Creating %s' % path)
+            os.makedirs(path)
+        else:
+            Console.inform('%s already exists' % path)
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import sys
 from console import Console
-from runner import NmapScans
-from runner import WebCommands
+from runner import FtpCommands, NmapCommands, WebCommands, DnsCommands, SmbCommands
 from objects import Project
+
 
 def main_menu():
     c = ''
@@ -20,7 +20,13 @@ def main_menu():
         print ''
         print '     1. Add targets'
         print '     2. Port scans'
-        print '     3. Web scans'
+        print '     3. Web [80/443]'
+        print '     4. FTP [21]'
+        print '     5. SSH [22]'
+        print '     6. DNS [53]'
+        print '     7. SMB [139]'
+        print '     8. MySQL [3306]'
+        print '     80. Configure'
         print '     98. Print'
         print '     99. Quit'
         print ''
@@ -35,6 +41,21 @@ def main_menu():
 
         elif c == '3':
             web_scans(p)
+
+        elif c == '4':
+            ftp_scans(p)
+
+        elif c == '5':
+            Console.prompt('No brute forcing implemented')
+
+        elif c == '6':
+            dns_scans(p)
+
+        elif c == '7':
+            smb_scans(p)
+
+        elif c == '80':
+            configure(p)
 
         elif c == '98':
             print p
@@ -54,14 +75,14 @@ def add_targets(project):
     print '              Add targets'
     print '========================================'
     print ''
-    print '     1. Use nmap \'liveness\' scan (-sn -PE)'
+    print '     1. Use nmap \'liveness\' scan (-sn + -sn -PE)'
     print '     2. Read existing from files (have you done this before?)'
     print '     99. Return'
     print ''
     a = Console.prompt('What\'ll it be sweetheart? ')
 
     if a == '1':
-        NmapScans.scan_for_live_hosts(p)
+        NmapCommands.scan_for_live_hosts(p)
     elif a == '2':
         Project.read_existing_from_file(project)
 
@@ -75,24 +96,30 @@ def manual_port_scans(project):
         print '========================================'
         print ''
         print '     1. Full scan (all scans below)'
-        print '     2. UDP Scan (-sUV -f)'
-        print '     3. TCP Full Scan (-p-)'
-        print '     4. TCP Scan Services, known ports (-sS -A -p [TCP Ports])'
-        print '     5. UDP Scan Services, known ports (-sU -A -p [UDP Ports])'
+        print '     2. TCP Quick Scan (top 1000 ports)'
+        print '     3. UDP Scan (-sUV -f)'
+        print '     4. TCP Full Scan (-p-)'
+        print '     5. TCP Scan Services, known ports (-sS -A -p [TCP Ports])'
+        print '     6. UDP Scan Services, known ports (-sU -A -p [UDP Ports])'
         print '     99. Return'
         print ''
         a = Console.prompt('What\'ll it be sweetheart? ')
 
         if '1' == a:
-            NmapScans.scan_all_ports(project)
+            # NmapCommands.scan_all_ports(project)
+            NmapCommands.scan_all_ports_paralel(project)
         elif a == '2':
-            NmapScans.scan_udp(project)
+            # NmapCommands.scan_quick_tcp(project)
+            NmapCommands.scan_quick_tcp_paralel(project)
         elif a == '3':
-            NmapScans.scan_all_tcp_ports(project)
+            #NmapCommands.scan_udp(project)
+            NmapCommands.scan_udp_paralel(project)
         elif a == '4':
-            NmapScans.scan_full_tcp_ports(project)
+            NmapCommands.scan_all_tcp_ports_masscan(project)
         elif a == '5':
-            NmapScans.scan_full_udp_ports(project)
+            NmapCommands.scan_full_tcp_ports(project)
+        elif a == '6':
+            NmapCommands.scan_full_udp_ports(project)
         elif a == '99':
             return
 
@@ -118,15 +145,113 @@ def web_scans(project):
 
         if a == '1':
             WebCommands.run_webscans(project)
-
         elif a == '2':
             WebCommands.run_whatweb(project)
-
         elif a == '3':
             WebCommands.run_nikto(project)
-
         elif a == '4':
             WebCommands.run_dirsearch(project)
+        elif a == '99':
+            return
+
+
+def ftp_scans(project):
+    a = ''
+    while a != '99':
+        print ''
+        print '========================================'
+        print '            FTP Scans'
+        print '========================================'
+        print ''
+        print '     1. Automagic scan'
+        print '     2. Manual nmap FTP Scan'
+        print '     3. Manual FTP brute force'
+        print '     99. Quit'
+        print ''
+        a = Console.prompt('What\'ll it be sweetheart? ')
+
+        if a == '1':
+            FtpCommands.run_ftpscans(project)
+        elif a == '2':
+            FtpCommands.run_nmap_scripts(project)
+        elif a == '3':
+            FtpCommands.run_hydra_ftp(project)
+        elif a == '99':
+            return
+
+
+def dns_scans(project):
+    a = ''
+    while a != '99':
+        print ''
+        print '========================================'
+        print '            DNS Scans'
+        print '========================================'
+        print ''
+        print '     1. Automagic scan'
+        print '     2. Manual nmblookup'
+        print '     3. Manual zone transfer'
+        print '     99. Quit'
+        print ''
+        a = Console.prompt('What\'ll it be sweetheart? ')
+
+        if a == '1':
+            DnsCommands.run_dnsscans(project)
+        elif a == '2':
+            Console.inform('Not implemented')
+        elif a == '3':
+            Console.inform('Not implemented')
+        elif a == '99':
+            return
+
+
+def smb_scans(project):
+    a = ''
+    while a != '99':
+        print ''
+        print '========================================'
+        print '            SMB Scans'
+        print '========================================'
+        print ''
+        print '     1. Automagic scan'
+        print '     2. Manual enum4linux'
+        print '     99. Quit'
+        print ''
+        a = Console.prompt('What\'ll it be sweetheart? ')
+
+        if a == '1':
+            SmbCommands.run_smbscans(project)
+        elif a == '2':
+            Console.inform('Not implemented')
+        elif a == '99':
+            return
+
+
+def configure(project):
+    a = ''
+    while a != '99':
+        print ''
+        print '========================================'
+        print '           Configure'
+        print '========================================'
+        print ''
+        print '     1. Set password file'
+        print '     2. ddd'
+        print '     3. ddd'
+        print '     99. Return'
+        print ''
+        a = Console.prompt('What\'ll it be sweetheart? ')
+
+        if '1' == a:
+            project.password_file = Console.prompt('Enter the password file name:')
+        elif a == '2':
+            print 'ddd'
+        elif a == '3':
+            print 'ddd'
+        elif a == '99':
+            return
+        else:
+            print 'Nee fok, ek weet nie wat jy soek nie'
 
 
 def exit_stage():

@@ -12,6 +12,7 @@ class Project:
             pa = Console.prompt('Enter the project folder: ')
             self.path = os.path.abspath(pa)
             print ''
+        self.password_file = ''
         self.check_structure()
 
     def __str__(self):
@@ -48,10 +49,31 @@ class Project:
     def get_notes_file_name(self):
         return self.path + '/evidence/notes.md'
 
+    def get_userlist_file_name(self):
+        return self.path + '/users.txt'
+
+    def get_password_file_name(self):
+        return self.password_file
+
     def get_host_from_ip(self, ip=''):
         for h in self.hosts:
             if ip == h.ip:
                 return h
+
+    def get_port_from_ip_port_num(self, ip='', port_num=''):
+        print 'get_port_from_ip_port_num %s:%s' % (ip, port_num)
+        for h in self.hosts:
+            if h is not None:
+                print "found host"
+            if ip == h.ip:
+                if ip is not None:
+                    print 'found ip'
+                for p in h.ports:
+                    if p is not None:
+                        print 'port is not none: %s' % p.port_num
+                    if port_num == p.port_num[:-4]:
+                        print 'returning the fucking port: %s' % p
+                        return p
 
     def read_existing_from_file(self):
         Console.inform('Reading from existing files')
@@ -66,7 +88,7 @@ class Project:
             with open(fn, 'r') as f:
                 for pds in f.read().splitlines():
                     pdsarr = pds.split('==')
-                    p = Port(port_num=pdsarr[0], status=pdsarr[1], service=pdsarr[2], version=pdsarr[3])
+                    p = Port(host=host, port_num=pdsarr[0], status=pdsarr[1], service=pdsarr[2], version=pdsarr[3])
                     host.add_port(p)
 
     # def write_hosts_to_file(self):
@@ -161,13 +183,13 @@ class Host:
                 return
         # If this port has not been added before
         Console.add('Adding port %s' % port_num)
-        p = Port(port_num, status, service, version)
+        p = Port(self, port_num, status, service, version)
         self.ports.append(p)
 
     def write_ports_to_file(self):
         with open(self.get_notes_file_name(), 'a') as nf:
-            nf.write('Port Num | Service | Version')
-            nf.write('---|---|---')
+            nf.write('Port Num | Service | Version\n')
+            nf.write('---|---|---\n')
             with open(self.get_ports_file_name(), 'w') as pf:
                 for p in self.ports:
                     pf.write('%s==%s==%s==%s\n' % (p.port_num, p.status, p.service, p.version))
@@ -177,11 +199,15 @@ class Host:
 
 class Port:
 
-    def __init__(self, port_num, status='', service='', version=''):
+    def __init__(self, host, port_num, status='', service='', version=''):
         self.port_num = port_num
         self.status = status
         self.service = service
         self.version = version
+        self.path = host.get_folder_name() + '/' + self.port_num[:-4]
 
     def __str__(self):
         return '\t%s: %s \t\t%s\t\t%s' % (self.port_num, self.status, self.service, self.version)
+
+    def get_folder_name(self):
+        return self.path

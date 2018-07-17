@@ -9,3 +9,9 @@
 * List all services `> sc queryex type= service state= all` OR `> net start` OR `$ wmic service list brief --> lists all services`
 * Command to stop a service: `net stop servicename`
 
+also see 
+
+{% page-ref page="linux/linux-privilege-escalation.md" %}
+
+
+
